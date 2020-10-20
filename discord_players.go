@@ -4,6 +4,10 @@
 
 package main
 
+import (
+	//"github.com/bwmarrin/discordgo"
+)
+
 type AmongPlayerRoleType int
 
 const (
@@ -24,7 +28,7 @@ type DiscordPlayer struct {
 }
 
 
-func NewDiscordPlayer() *DiscordPlayer {
+func newDiscordPlayer() *DiscordPlayer {
 	/// TODO : unmock, pour linstant je mock pour test
 	/// la feature talkie
 	return &DiscordPlayer{
@@ -33,4 +37,8 @@ func NewDiscordPlayer() *DiscordPlayer {
 	}
 }
 
-func AddAmongRoleToDiscordRole
+
+// TODO: Continuer de voir si c'est possible de trouver
+// func GetAllPlayerOfdiscordChan(*discordgo.Channel) {
+//
+// }

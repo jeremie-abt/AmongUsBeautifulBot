@@ -1,20 +1,18 @@
 package main
 
-// GameConfig
-// This struct should retain information on the overall
-// Config of the game :
-// Either basic configs like light range or custom config
-// Like which role Are needed etc ...
+// Config for a entire discord server
+// TODO: Maybe support per discord channel / among game
+// custom settings, but now only one config for one
+// discord server
 type GameConfig struct {
 	NbImpostor int
-	 // ...
-	 // TODO : Really support these kind of default config
-	 // and think of a design not too hard to get into
+	LightRange int
+	// TODO, faire un tour dans les configs de amongus
 
-	 // Custom config
-	 // 	Some custom config ...
-	 // Role (see role.txt)
-	 WantTalkie bool
+	// Custom config
+	// 	Some custom config ...
+	// Role (see role.txt)
+	WantTalkie bool
 }
 
 // Cette methode est amener a beaucoup changer,

@@ -1,0 +1,26 @@
+Du coup among us n'est dispo uniquement que sur Windows.
+Donc je vais tous simplement mocker tous ca, pui ensuite
+je coderai et adapterai mon code sur windows !
+
+Competence :
+	- Coder proprement pour que ladaptation et la refacto windows
+	ne soit pas trop violente a encaisser
+
+
+Histo de choix :
+	- Actuellement je suis fasse aux choix suivant :
+		jai pas mal dinterface et de partie du jeux a coder,
+		et je suis face a un dileme sois je les fais toutes
+		vite fais en mockant 90 % de chaque partie soit je les
+		fais vraiment bien mais une part une
+		-> Je vais prendre loption 2 on verra ce que ca donne
+		-> Changement je prends loption 1 car chauqe objet
+		va dependre d'une autre partie de code, par contre
+		attention au dependence entre partie de code, essayer
+		de faire le moins dependant possible !
+
+
+En jen suis (a effacer a chaque fois) :
+	la je viens de reussir a choper le channel via
+	discordgo, par contre je ne sais pas pk ca ne le link
+	pas correctement

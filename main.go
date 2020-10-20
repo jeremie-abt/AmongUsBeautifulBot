@@ -17,12 +17,39 @@ func setup() {
 	// TODO : Assign randomly Tag (based on some config)
 }
 
+
+
+var GlobalVarManager GlobalVarManagerType
 func main() {
 
-	Gconf := NewGameConfig()
-	fmt.Printf("init connexion %v ...\n\n", Gconf)
-
+	// TODO : Recheck un peu les struct dans struct.go
+	// et init mon gobal var
 	
+	dg, err := discordgo.New("Bot " + "NzY2NzUyODEwOTI2MzQyMjM5.X4n8Mw.gS1DzyAEiO29ELQqdA-I2zaO5ec")
+
+	testGuid, err := dg.Guild("766750463524732968")
+	fmt.Printf("yo le rap%v\n\n", testGuid)
+
+	/*
+	**	Not sure yet of the design yet, but I'll do
+	**	a big struct containing litle struct more
+	**	specific in the part of the code they're using
+	**	I'm instantiating for now all the litle struct
+	**	under this and I'll do the struct after
+	*/	
+
+
+	// Config struct
+	Gconf := NewGameConfig()
+	// Discord Channel struct
+	discordChan, err := NewDiscordChanStruct("766941016699305984", dg)
+	if err != nil {
+		fmt.Printf("Err getting channel : %v\n", err)
+		return
+	}
+	// Player struct (recup depuis le chan)
+
+	fmt.Printf("init connexion %v ...\n\n", Gconf)
 
 	// TODO : Needed avant de faire cette feature :
 	//	List de Personne
@@ -34,21 +61,27 @@ func main() {
 	// la creation de player je pense
 
 	// TODO : Receveoir une liste de player et non pas un seul player
-	dcPlayer := NewDiscordPlayer()
+	//dcPlayer := NewDiscordPlayer()
 
 
-	return
-	// TODO : Essayer de faire la feature du talkie
+	// TODO: Gros gros refacto pour gerer tous le monde
+	// Il faudra gerer les sessions propre a chacun etc ...
+	// je vais plus ou moins mocker tous ca le temps de
+	// me familiariser avec le go puis de lire de trois
+	// trucs sur la concurency mais faudra faire ca clean
+	// ca va etre plutot style
 
 
-	dg, err := discordgo.New("Bot " + "NzY2NzUyODEwOTI2MzQyMjM5.X4n8Mw.SpMt4yaPAtkeksY5RRRdIQQZJnk")
+	fmt.Printf("chantest : %v\n", discordChan)
 	if err != nil {
 		fmt.Printf("Err instantiating bot : %s\n", err)
+		return
 	}
 
-	dg.AddHandler(MyFirstHandler)
+	//dg.AddHandler(VoiceStateHandler)
+	dg.AddHandler(testHandler)
 
-	dg.Identify.Intents = discordgo.MakeIntent(discordgo.IntentsGuildMessages)
+	dg.Identify.Intents = discordgo.MakeIntent(discordgo.IntentsAllWithoutPrivileged)
 
 	// Open socket and begin listen
 	err = dg.Open()
@@ -69,8 +102,8 @@ func main() {
 	dg.Close()
 }
 
-
-func MyFirstHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
-
-	fmt.Printf("Bonour ma fonctio est called %v\n\n", m.Message)
+func testHandler(s *discordgo.Session, m *discordgo.VoiceStateUpdate) {
+		fmt.Printf("discord : %+v\n\n", m.VoiceState)
 }
+
+// TODO: etudier le pattern que discordgo utilse pour les events
