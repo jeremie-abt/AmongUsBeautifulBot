@@ -25,18 +25,23 @@ type DiscordPlayer struct {
 	// TODO : Define ID properly with discordgo type
 	Id string
 	AmongPlayerRole AmongPlayerRoleType
+
+	isMute bool
+	isDeaf bool
+	channelID string
+	// TODO: Reflechir au chan Id jsuis pas sur que ce soit
+	// judicieux de le mettre la !
 }
 
 
-func newDiscordPlayer() *DiscordPlayer {
+func NewDiscordPlayer(userId string) *DiscordPlayer {
 	/// TODO : unmock, pour linstant je mock pour test
 	/// la feature talkie
 	return &DiscordPlayer{
-		Id: "jejems",
+		Id: userId,
 		AmongPlayerRole: Talkie,
 	}
 }
-
 
 // TODO: Continuer de voir si c'est possible de trouver
 // func GetAllPlayerOfdiscordChan(*discordgo.Channel) {

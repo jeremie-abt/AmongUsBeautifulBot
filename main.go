@@ -1,67 +1,49 @@
 package main
 
-
 import (
 	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
+	"encoding/json"
+	"io/ioutil"
+	"strings"
 
 	"github.com/bwmarrin/discordgo"
 )
 
-func setup() {
-	// I dont know where this func is going for 
-	// now But It'll Done somme setup work
 
-	// TODO : Assign randomly Tag (based on some config)
-}
-
-
-
+// TODO : Comment faire ca plus clean que 50 ?
 var GlobalVarManager GlobalVarManagerType
+
 func main() {
-
-	// TODO : Recheck un peu les struct dans struct.go
-	// et init mon gobal var
 	
-	dg, err := discordgo.New("Bot " + "NzY2NzUyODEwOTI2MzQyMjM5.X4n8Mw.gS1DzyAEiO29ELQqdA-I2zaO5ec")
+	test_map_readjson := make(map[string]string)
 
-	testGuid, err := dg.Guild("766750463524732968")
-	fmt.Printf("yo le rap%v\n\n", testGuid)
+	json_config_file, _ := os.Open("config.json")
+	ret, _ := ioutil.ReadAll(json_config_file)
 
-	/*
-	**	Not sure yet of the design yet, but I'll do
-	**	a big struct containing litle struct more
-	**	specific in the part of the code they're using
-	**	I'm instantiating for now all the litle struct
-	**	under this and I'll do the struct after
-	*/	
+	json.Unmarshal(ret, &test_map_readjson)
+	bot_token := test_map_readjson["bot_token"]
+	
+	dg, err := discordgo.New("Bot " + bot_token)
+
+	jejemsMockGuild := NewGuildManager(dg, "766750463524732968")
+	GlobalVarManager.GuildManagers = (
+		append(GlobalVarManager.GuildManagers, jejemsMockGuild))
 
 
 	// Config struct
 	Gconf := NewGameConfig()
 	// Discord Channel struct
-	discordChan, err := NewDiscordChanStruct("766941016699305984", dg)
-	if err != nil {
-		fmt.Printf("Err getting channel : %v\n", err)
-		return
-	}
+//	discordChan, err := NewDiscordChanStruct("766750463524732968", dg)
+//	if err != nil {
+//		fmt.Printf("Err getting channel : %v\n", err)
+//		return
+//	}
 	// Player struct (recup depuis le chan)
 
 	fmt.Printf("init connexion %v ...\n\n", Gconf)
-
-	// TODO : Needed avant de faire cette feature :
-	//	List de Personne
-	//	Fonction de list de personne qui en choisit une random
-	//	lui assigne le role
-	//	Attention a la compat avec les infos que je voudrais plus tard pour une personne
-	// TODO : Implementation de la logique qui gere les channels
-	// discord, c'est lui qui devra ensuite appeler
-	// la creation de player je pense
-
-	// TODO : Receveoir une liste de player et non pas un seul player
-	//dcPlayer := NewDiscordPlayer()
 
 
 	// TODO: Gros gros refacto pour gerer tous le monde
@@ -72,14 +54,13 @@ func main() {
 	// ca va etre plutot style
 
 
-	fmt.Printf("chantest : %v\n", discordChan)
 	if err != nil {
 		fmt.Printf("Err instantiating bot : %s\n", err)
 		return
 	}
 
-	//dg.AddHandler(VoiceStateHandler)
-	dg.AddHandler(testHandler)
+	dg.AddHandler(voiceChangeHandler)
+	dg.AddHandler(messageSendHanlder)
 
 	dg.Identify.Intents = discordgo.MakeIntent(discordgo.IntentsAllWithoutPrivileged)
 
@@ -102,8 +83,45 @@ func main() {
 	dg.Close()
 }
 
-func testHandler(s *discordgo.Session, m *discordgo.VoiceStateUpdate) {
-		fmt.Printf("discord : %+v\n\n", m.VoiceState)
+
+// Managing VoiceUpdate change
+func voiceChangeHandler(s *discordgo.Session, m *discordgo.VoiceStateUpdate) {
+	currentGuild := GlobalVarManager.getGuildObj(m.VoiceState.GuildID)
+	currentGuild.HandleVoiceChange(m.VoiceState)
+
 }
 
-// TODO: etudier le pattern que discordgo utilse pour les events
+func messageSendHanlder(s *discordgo.Session, m *discordgo.MessageCreate) {
+	curMessage := m.Message
+	currentGuild := GlobalVarManager.getGuildObj(curMessage.GuildID)
+
+	if strings.HasPrefix(strings.ToLower(curMessage.Content), ".creategame") {
+		// get le channel pour commencer une game
+
+		if len(curMessage.Content) <= 11 {
+			return // TODO : Gerer la gestion d'erreur
+			// Probablement renvoyer un usage
+		} else {
+			gameChanName := curMessage.Content[12:]
+			allChan, err := s.GuildChannels(curMessage.GuildID)
+			if err != nil {
+				fmt.Printf("Voici le err : %+v\n", err)
+				return
+			}
+			// TODO : Il reste q check si le chan existe, que ce soit bien un type quil faut
+			// Et sinon creer le chan jimagine
+			// et ensuite finalement creer la game
+			var chanMatched string
+			for _, curChan := range(allChan) {
+				if (curChan.Name == gameChanName &&
+						curChan.Type == discordgo.ChannelTypeGuildVoice) {
+					chanMatched = curChan.ID
+				}
+			}
+
+			newGame := NewGame(chanMatched, NewGameConfig())
+			currentGuild.AttachGame(newGame)
+
+		}
+	}
+}
