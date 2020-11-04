@@ -1,0 +1,19 @@
+CREATE TABLE IF NOT EXISTS GamesWinHisto (
+	`uid` INTEGER PRIMARY KEY AUTOINCREMENT,
+	`idPlayer` INTEGER,
+	`idGuild` INTEGER,
+	`idChan` INTEGER,
+	`CreatedAt` DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS Player (
+	`uid` INTEGER PRIMARY KEY AUTOINCREMENT, -- linked to idPlayer in GamesHisto
+	`discordId` INTEGER,
+	`guildPlayed` TEXT
+);
+
+CREATE TABLE IF NOT EXISTS Guild (
+	`uid` INTEGER PRIMARY KEY AUTOINCREMENT, -- linked with idGuild in GamesHisto
+	`discordId` INTEGER,
+	`nbGamesFailed` INTEGER
+);
