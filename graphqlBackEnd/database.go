@@ -43,13 +43,13 @@ func InsertNewWin(db *sql.DB, newWin *GameWinHisto) int64 {
 		newWin.IdPlayer, newWin.IdGuild, newWin.IdChan)
 
 	if err != nil {
-		fmt.Printf("Err : %+v\n")
+		fmt.Printf("Err : %+v\n", err)
 		panic("gere les erreurs")
 	}
 
 	lastInsertedId, err := result.LastInsertId()
 	if err != nil {
-		fmt.Printf("Err : %+v\n")
+		fmt.Printf("Err : %+v\n", err)
 		panic("gere les erreurs")
 	}
 	return lastInsertedId
@@ -58,14 +58,14 @@ func InsertNewWin(db *sql.DB, newWin *GameWinHisto) int64 {
 func InsertNewPlayer(db *sql.DB, newPlayer *Player) int64 {
 
 	statement, err := db.Prepare(`
-		INSERT INTO Player (guildPlayed, discordId) VALUES (?, ?)
+		INSERT INTO Player (discordId, guildPlayed) VALUES (?, ?)
 	`)
 
 	if err != nil {
 		fmt.Printf("err : %+v\n", err)
 		panic("gere les erreurs")
 	}
-	result, err := statement.Exec(newPlayer.GuildPlayed, newPlayer.DiscordId)
+	result, err := statement.Exec(newPlayer.DiscordId, newPlayer.GuildPlayed)
 	if err != nil {
 		fmt.Printf("error : %+v\n\n", err)
 		panic("gere les errors")
@@ -83,14 +83,14 @@ func InsertNewPlayer(db *sql.DB, newPlayer *Player) int64 {
 func InsertNewGuild(db *sql.DB, newGuild *Guild) int64 {
 
 	statement, err := db.Prepare(`
-		INSERT INTO Guild (nbGamesFailed, discordId) VALUES (?, ?)
+		INSERT INTO Guild (discordId, ) VALUES (?, ?)
 	`)
 
 	if err != nil {
 		fmt.Printf("err : %+v\n", err)
 		panic("gere les erreurs")
 	}
-	ret, err := statement.Exec(newGuild.NbGamesFailed, newGuild.DiscordId)
+	ret, err := statement.Exec(newGuild.DiscordId, newGuild.NbGamesFailed)
 	if err != nil {
 		fmt.Printf("error : %+v\n\n", err)
 		panic("gere les errors")
