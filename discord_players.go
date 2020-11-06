@@ -5,17 +5,8 @@
 package main
 
 import (
-	//"github.com/bwmarrin/discordgo"
+//"github.com/bwmarrin/discordgo"
 )
-
-type AmongPlayerRoleType int
-
-const (
-	Innocent AmongPlayerRoleType = iota
-	Talkie
-	impostor
-)
-
 
 /// TODO : This struct will probably evolve
 /// IN order to use more realistics stuff
@@ -23,22 +14,21 @@ const (
 /// etc ...
 type DiscordPlayer struct {
 	// TODO : Define ID properly with discordgo type
-	Id string
-	AmongPlayerRole AmongPlayerRoleType
+	Id              string
+	AmongPlayerRole CustomRoleName
 
-	isMute bool
-	isDeaf bool
+	isMute    bool
+	isDeaf    bool
 	channelID string
 	// TODO: Reflechir au chan Id jsuis pas sur que ce soit
 	// judicieux de le mettre la !
 }
 
-
 func NewDiscordPlayer(userId string) *DiscordPlayer {
 	/// TODO : unmock, pour linstant je mock pour test
 	/// la feature talkie
 	return &DiscordPlayer{
-		Id: userId,
+		Id:              userId,
 		AmongPlayerRole: Talkie,
 	}
 }

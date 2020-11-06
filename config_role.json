@@ -1,0 +1,8 @@
+{
+	"nb_roles_wanted": 3,
+	"nb_roles_overlapping": 2,
+	"random_composition": true,
+	"composition": [
+		"talkie", "voyante", "rolegiver"
+	]
+}

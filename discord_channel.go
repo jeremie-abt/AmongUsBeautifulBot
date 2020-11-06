@@ -7,45 +7,50 @@
 
 package main
 
-
 import (
+	"fmt"
+
 	"github.com/bwmarrin/discordgo"
 )
 
-
-//type DiscordChannel struct {
-//	name string
-//}
-//
-//
-//func NewDiscordChan() (*DiscordChannel) {
-//	return &{
-//		""
-//	}
-//}
-//
-//
-///// Get all players within chan
-//func GetAllPlayerFromChan()
-
-
-type channelStruct struct {
-	Id string
-	discordChan *discordgo.Channel
-}
-
-
-func NewDiscordChanStruct(
-		Id string, dg *discordgo.Session) (*channelStruct, error) {
-
-	discordChan, err := dg.Channel(Id)
-
+func CreateNewChan(
+	s *discordgo.Session, guildID string, name string,
+) *discordgo.Channel {
+	ret, err := s.GuildChannelCreate(
+		guildID, name, discordgo.ChannelTypeGuildVoice)
 	if err != nil {
-		return nil, err
+		// TODO : Manage les erreurs
+		panic("error creating chan\n")
 	}
-	
-	return &channelStruct{
-		Id: Id,
-		discordChan: discordChan,
-	}, nil
+	return ret
 }
+
+func DeleteChan(s *discordgo.Session, chanId string) error {
+	_, err := s.ChannelDelete(chanId)
+	if err != nil {
+		return fmt.Errorf("could not delete chan")
+	}
+	return nil
+}
+
+// TODO: A voir mais normalement j'en ai plus besoins
+//type channelStruct struct {
+//	Id string
+//	discordChan *discordgo.Channel
+//}
+//
+//
+//func NewDiscordChanStruct(
+//		Id string, dg *discordgo.Session) (*channelStruct, error) {
+//
+//	discordChan, err := dg.Channel(Id)
+//
+//	if err != nil {
+//		return nil, err
+//	}
+//
+//	return &channelStruct{
+//		Id: Id,
+//		discordChan: discordChan,
+//	}, nil
+//}
