@@ -2,16 +2,17 @@ package main
 
 import (
 	"fmt"
-	"net/http"
 	"log"
+	"net/http"
 	"time"
 
-	"github.com/gorilla/websocket"
+	socketio "github.com/googollee/go-socket.io"
 	"github.com/gorilla/mux"
+	"github.com/gorilla/websocket"
 )
 
 var upgrader = websocket.Upgrader{
-	ReadBufferSize: 1024,
+	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
 }
 
@@ -47,11 +48,24 @@ func testFunc(res http.ResponseWriter, req *http.Request) {
 
 func main() {
 	router := mux.NewRouter()
+	server, err := socketio.NewServer(nil)
+
+	if err != nil {
+		fmt.Printf("err %s\n", err)
+	}
+	server.OnConnect("/", func(s socketio.Conn) error {
+		s.SetContext("")
+		println("Yo je suis connecte !!\n")
+		return nil
+	})
+
+	go server.Serve()
+	defer server.Close()
 
 	// TODO: Debug / trouver un moyen de fix ca
 	// En gros quand je passe par ngrok il
 	// pense que je tape sur /socket.io/
-	router.HandleFunc("/socket.io/", testFunc)
+	router.Handle("/socket.io/", server)
 
 	// TODO : jai casi tous setup, par contre je narrive pas a communique depuis ngrok
 	// je ne recois rien ici je ne sais pas pk
