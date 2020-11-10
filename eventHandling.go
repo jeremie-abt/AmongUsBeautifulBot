@@ -29,11 +29,6 @@ type eventType struct {
 **	Managing Discord event
 */
 
-// Managing VoiceUpdate change
-func VoiceChangeHandler(s *discordgo.Session, m *discordgo.VoiceStateUpdate) {
-	currentGuild := G_Gvm.getGuildObj(m.VoiceState.GuildID)
-	currentGuild.HandleVoiceChange(m.VoiceState)
-}
 
 func MessageSendHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	var currentGuild *GuildManagerType

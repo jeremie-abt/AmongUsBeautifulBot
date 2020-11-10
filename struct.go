@@ -83,29 +83,6 @@ func NewGuildManager(s *discordgo.Session, GuildId string) *GuildManagerType {
 	}
 }
 
-// TODO: Test et definir cette partie car je ne suis meme pas sur
-// de ce que ca doit faire
-func (gm *GuildManagerType) HandleVoiceChange(m *discordgo.VoiceState) {
-	/*
-		Est-ce quon doit faire quelque chose ??
-	*/	
-
-
-	fmt.Printf("Handlevoice ...\n")
-	if _, ok := gm.AUUsers[m.UserID]; !ok {
-		newPlayer := NewDiscordPlayer(m.UserID)
-		gm.AUUsers[m.UserID] = newPlayer
-	} else {
-		//TODO : ??
-		playerToUpdate := gm.AUUsers[m.UserID]
-		playerToUpdate.isMute = m.SelfMute
-		playerToUpdate.isDeaf = m.SelfDeaf
-		playerToUpdate.channelID = m.ChannelID
-		// TODO : verif pour voir si le quota de joueur n'est pas
-		// depasse
-	}
-}
-
 // TODO : A voir si ca a vraiment du sens d'impl cette methode
 // pour le guild manager, plutot que de faire une simple methode
 // qui prend un guild ID en param ?

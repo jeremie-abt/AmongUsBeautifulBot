@@ -48,7 +48,6 @@ func main() {
 
 	G_Gvm = NewGlobalVarManager(dg)
 
-	dg.AddHandler(VoiceChangeHandler)
 	dg.AddHandler(MessageSendHandler)
 
 	err := dg.Open()
