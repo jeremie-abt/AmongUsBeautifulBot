@@ -5,12 +5,29 @@ import (
 
 	"fmt"
 	"github.com/bwmarrin/discordgo"
+
+	"math/rand"
 )
+
 
 type Game struct {
 	IdChan string
 
 	GameConfig *GameConfig
+	CaptureCode string
+
+	// Does someone in the lobby has plug the amonguscapture ??
+	IsCapturedConn bool
+}
+
+var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
+func randSeq(n int) string {
+    b := make([]rune, n)
+    for i := range b {
+        b[i] = letters[rand.Intn(len(letters))]
+    }
+    return string(b)
 }
 
 // Take an chan Id and verify if the game is related to this chan
@@ -24,9 +41,13 @@ func (game *Game) isGameRelatedToChan(chanId string) bool {
 // TODO : not tested
 func NewGame(ChannelId string, GameConfig *GameConfig) *Game {
 
+	generatedCode := randSeq(10)
+	fmt.Printf("Voici le code : %s\n", generatedCode)
+
 	return &Game{
 		IdChan:     ChannelId,
 		GameConfig: GameConfig,
+		CaptureCode: generatedCode,
 	}
 }
 
@@ -40,6 +61,10 @@ func NewGame(ChannelId string, GameConfig *GameConfig) *Game {
 /// et a partir d'un joueru une game, par contre si on
 /// a souvent besoins de recup les players d'une game
 /// la il faudrat en effet faire quelque chose
+
+// TODO : implementer des systemes de lock
+// pour a terme toujours passer par des fonctions pour toucher
+// a cette struct
 
 type GuildManagerType struct {
 	// AU -> Amongus ;)
@@ -58,22 +83,20 @@ func NewGuildManager(s *discordgo.Session, GuildId string) *GuildManagerType {
 	}
 }
 
-// TODO: on track tous les joueurs,
-//	Attention a ca tout de meme, ca fait beaucoup de calcul pour rien
+// TODO: Test et definir cette partie car je ne suis meme pas sur
+// de ce que ca doit faire
 func (gm *GuildManagerType) HandleVoiceChange(m *discordgo.VoiceState) {
+	/*
+		Est-ce quon doit faire quelque chose ??
+	*/	
+
+
 	fmt.Printf("Handlevoice ...\n")
 	if _, ok := gm.AUUsers[m.UserID]; !ok {
-		fmt.Printf("je rentre cond 1\n")
 		newPlayer := NewDiscordPlayer(m.UserID)
 		gm.AUUsers[m.UserID] = newPlayer
-		//for game := range gm.AUGames {
-		//	if game.isGameRelatedToChan(m.ChannelID) {
-
-		//	}
-		//}
 	} else {
-
-		fmt.Printf("je rentre cond 1\n")
+		//TODO : ??
 		playerToUpdate := gm.AUUsers[m.UserID]
 		playerToUpdate.isMute = m.SelfMute
 		playerToUpdate.isDeaf = m.SelfDeaf
@@ -155,20 +178,53 @@ func (gm *GuildManagerType) AttachGame(game *Game) {
 }
 
 /*
-**	GlobalVarManager is a struct which will be global
-**	Its purpose is to hold all the data needed within
-**	event handler ?
- */
+**		GLOBAL var manager :
+**			Global struct containing all the state the bot has
+**			in-memory
+*/
 
 type GlobalVarManagerType struct {
-	GuildManagers []*GuildManagerType
+	GuildManagers 	[]*GuildManagerType
+	Sess			*discordgo.Session
 }
+
+func NewGlobalVarManager(s *discordgo.Session) GlobalVarManagerType {
+	return GlobalVarManagerType{
+		Sess: s,
+	}
+}
+
+var G_Gvm GlobalVarManagerType
 
 // TODO: Trouver comment revenir a la ligne
 func (gvmanager *GlobalVarManagerType) getGuildObj(GuildId string) *GuildManagerType {
 	for _, guildManager := range gvmanager.GuildManagers {
 		if guildManager.GuildId == GuildId {
 			return guildManager
+		}
+	}
+	return nil
+}
+
+func (gvm *GlobalVarManagerType) AddGuild(guildID string) *GuildManagerType {
+	// TODO: lock
+	newguild := NewGuildManager(gvm.Sess, guildID)
+
+	gvm.GuildManagers = append(gvm.GuildManagers, newguild)
+	return newguild
+}
+
+// TODO(optionnel): implementer un generateur par type iterable
+// par exmple plutot que de loop sur les guilds, on appel une fonction
+// qui return un chan ou une list et hop
+func (gvm *GlobalVarManagerType) GetGameCode(code string) *Game {
+	for _, guildManager := range gvm.GuildManagers {
+		// iteration sur les games
+		for _, game := range guildManager.AUGames {
+			fmt.Printf("Game : %+v\n", game)
+			if code == game.CaptureCode {
+				return game
+			}
 		}
 	}
 	return nil

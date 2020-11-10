@@ -3,15 +3,16 @@ package main
 import (
 	"fmt"
 	"os"
-	//	"encoding/json"
+	"time"
+	"math/rand"
+	"encoding/json"
 	//	"fmt"
-	//	"io/ioutil"
+	"io/ioutil"
 	"os/signal"
 	"syscall"
-	//	"github.com/bwmarrin/discordgo"
+	"github.com/bwmarrin/discordgo"
 )
 
-var GlobalVarManager GlobalVarManagerType
 
 func StartAndManageSocketListening() {
 	// tentative d'implementation d'un pattern d'auto healing
@@ -36,12 +37,30 @@ func StartAndManageSocketListening() {
 }
 
 func main() {
+	rand.Seed(time.Now().UnixNano())
 
-	println("fsdfsdf\n")
+	json_config_file, _ := os.Open("config.json")
+	ret, _ := ioutil.ReadAll(json_config_file)
+	test_map_readjson := make(map[string]string)
+	json.Unmarshal(ret, &test_map_readjson)
+	bot_token := test_map_readjson["bot_token"]
+	dg, _ := discordgo.New("Bot " + bot_token)
+
+	G_Gvm = NewGlobalVarManager(dg)
+
+	dg.AddHandler(VoiceChangeHandler)
+	dg.AddHandler(MessageSendHandler)
+
+	err := dg.Open()
+
+	if err != nil {
+		fmt.Println("error opening connection,", err)
+		return
+	}
+
 	// pour lauto Heal, c'est lui qui doit avoir la capacite
 	// de relance le begin listen'
 	go StartAndManageSocketListening()
-	println("fsdfsdf\n")
 
 	fmt.Println("Bot is now running.  Press CTRL-C to exit.")
 	sc := make(chan os.Signal, 1)
