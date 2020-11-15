@@ -21,14 +21,19 @@ const (
 )
 
 type eventType struct {
-	eventType AUEventType
-	msg       string
+	eventType	AUEventType
+	msg			string
 }
 
 /*
 **	Managing Discord event
 */
 
+
+func HandleJoinChannel(s *discordgo.Session, v *discordgo.VoiceStateUpdate){
+	println("Voice connection ...\n")
+
+}
 
 func MessageSendHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	var currentGuild *GuildManagerType
@@ -45,20 +50,22 @@ func MessageSendHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		// get le channel pour commencer une game
 		HandleCreateGame(s, curMessage, currentGuild)
 	} else if strings.HasPrefix(
-		strings.ToLower(curMessage.Content), ".stopgame") {
+			strings.ToLower(curMessage.Content), ".stopgame") {
 
 		// TODO: si pas d'arg, propal de toutes les games
 		// a delete en fonction de sa guild
 		HandleStopGame(s, curMessage, currentGuild)
+	} else if strings.HasPrefix(
+			strings.ToLower(curMessage.Content), ".join") {
+		AddDiscordPlayerToGame(currentGuild, m)
 	}
 }
 
-/*
-**	Managing socket Event (amongus Capture)
-*/
-
-func SocketConnectCodeHandle(connectCode string) bool {
-
+func CheckAndLinkSocketCode(connectCode string) bool {
+	/*
+		check the socket connect to a valid game.
+		If Yes then we want to link them
+	*/
 	gameToConnect := G_Gvm.GetGameCode(connectCode)
 	if gameToConnect == nil {
 		// TODO: Gerer et enregistrer l'erreur proprement

@@ -49,6 +49,9 @@ func main() {
 	G_Gvm = NewGlobalVarManager(dg)
 
 	dg.AddHandler(MessageSendHandler)
+	dg.AddHandler(HandleJoinChannel)
+
+	handleCreateGameMock(dg)
 
 	err := dg.Open()
 

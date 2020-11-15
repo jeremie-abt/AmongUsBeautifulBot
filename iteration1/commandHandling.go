@@ -6,6 +6,24 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
+
+func handleCreateGameMock(s *discordgo.Session) {
+	
+	gm := G_Gvm.getGuildObj("766750463524732968")
+	if gm == nil {
+		gm = G_Gvm.AddGuild("766750463524732968")
+	}
+	fmt.Printf("gm : %+n\n")
+	newChanId, isExisting := gm.GetChanId(s, "testtest")
+	if isExisting == false {
+		createdChan := CreateNewChan(
+			s, gm.GuildId, "testtest")
+		newChanId = createdChan.ID
+	}
+	newGame := NewGame(newChanId, NewGameConfig("config_role.json"))
+	gm.AttachGame(newGame)
+}
+
 /*
 **	All bot command will have a function like this
 **	to treat the command

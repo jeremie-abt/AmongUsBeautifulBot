@@ -9,7 +9,6 @@ import (
 	"math/rand"
 )
 
-
 type Game struct {
 	IdChan string
 
@@ -18,19 +17,79 @@ type Game struct {
 
 	// Does someone in the lobby has plug the amonguscapture ??
 	IsCapturedConn bool
+
+	DiscordPlayers []*DiscordPlayer
 }
 
-var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
-
-func randSeq(n int) string {
-    b := make([]rune, n)
-    for i := range b {
-        b[i] = letters[rand.Intn(len(letters))]
-    }
-    return string(b)
+func (game *Game) AddPlayer(player *DiscordPlayer) {
+	if len(game.DiscordPlayers) > 10 {
+		// Among us Games are limited to 10 players
+		// TODO Log and do something
+		println("WARNING : trop de Players !!!\n")
+		return 
+	}
+	game.DiscordPlayers = append(game.DiscordPlayers, player)
 }
 
-// Take an chan Id and verify if the game is related to this chan
+func (game *Game) GetDiscordPlayerFromSocketEvt(amongUsName string) (*DiscordPlayer){
+
+	for _, discordPlayer := range game.DiscordPlayers {
+		if discordPlayer.AmongUsLinkedName == amongUsName {
+			return discordPlayer
+		}
+	}
+	return nil
+}
+
+func (game *Game) MuteAllPlayer(guildId string, mute bool) {
+	fmt.Printf("muteallplayer : %v ...\n", mute)
+	for _, discordPlayer := range game.DiscordPlayers {
+		fmt.Printf("Muting : %+v\n")
+		discordPlayer.Mute(guildId, mute)
+	}
+}
+
+func TryToLinkAUPlayerWithGame(AUplayerName string, captureCode string) {
+	/*
+		We want to link an among us player with a discord user.
+		Warning: if the discord name and the amongUs name are not
+		the same, then we won't link them.
+		Maybe we should have better heuristic or method -> TODO
+	*/
+
+	curGame, _ := GetGameFromCode(captureCode)
+	if curGame == nil {
+		// TODO: Log
+		fmt.Printf("Not any game linked with this code : %s\n", captureCode)
+		return
+	}
+	// TODO: Je n'ai pas reussi a faire la liste des personne
+	// presente dans un chan discord	
+}
+
+
+// ajouter un joueur discord a une partie
+func AddDiscordPlayerToGame(gm *GuildManagerType, m *discordgo.MessageCreate) error {
+	/*
+		Add discord player to Game
+	*/	
+	var discordPlayer *DiscordPlayer
+	if _, ok := gm.AUUsers[m.Message.Author.ID]; ok {
+		discordPlayer = gm.AUUsers[m.Message.Author.ID]
+	} else {
+		discordPlayer = NewDiscordPlayer(
+				m.Message.Author.ID, m.Message.Author.Username)
+	}
+
+	CHANNELID := "775637465981386792"
+	curGame := gm.GetGameByChanId(CHANNELID)
+	curGame.AddPlayer(discordPlayer)
+	
+	return nil
+}
+
+
+// Take a chan Id and verify if the game is related to this chan
 // Ptetre un peu overkill mais ca me permet de safiser mes struct
 // la par exemple, je peux changer IdChan en IDChan, je ne dois
 // update le code que dans cette methode
@@ -42,6 +101,8 @@ func (game *Game) isGameRelatedToChan(chanId string) bool {
 func NewGame(ChannelId string, GameConfig *GameConfig) *Game {
 
 	generatedCode := randSeq(10)
+	// Mock
+	generatedCode = "aaaaaaaaaa"
 	fmt.Printf("Voici le code : %s\n", generatedCode)
 
 	return &Game{
@@ -68,8 +129,10 @@ func NewGame(ChannelId string, GameConfig *GameConfig) *Game {
 
 type GuildManagerType struct {
 	// AU -> Amongus ;)
+	// TODO: Refacto -> C'est pas bon
 	AUUsers map[string]*DiscordPlayer
 	AUGames []*Game
+
 
 	GuildId string
 }
@@ -81,6 +144,17 @@ func NewGuildManager(s *discordgo.Session, GuildId string) *GuildManagerType {
 		AUUsers: amongUsUser,
 		GuildId: GuildId,
 	}
+}
+
+func GetGameFromCode(captureCode string) (*Game, *GuildManagerType) {
+	for _, guildManager := range G_Gvm.GuildManagers {
+		for _, curGame := range guildManager.AUGames {
+			if curGame.CaptureCode == captureCode {
+				return curGame, guildManager
+			}
+		}
+	}
+	return nil, nil
 }
 
 // TODO : A voir si ca a vraiment du sens d'impl cette methode
@@ -154,6 +228,15 @@ func (gm *GuildManagerType) AttachGame(game *Game) {
 	gm.AUGames = append(gm.AUGames, game)
 }
 
+func (gm *GuildManagerType) GetGameByChanId(chanId string) (*Game) {
+	for _, curGame :=  range gm.AUGames {
+		if curGame.IdChan == chanId {
+			return curGame
+		}
+	}
+	return nil
+}
+
 /*
 **		GLOBAL var manager :
 **			Global struct containing all the state the bot has
@@ -205,4 +288,15 @@ func (gvm *GlobalVarManagerType) GetGameCode(code string) *Game {
 		}
 	}
 	return nil
+}
+
+// ---------------------------------------- PRIVATE Func
+var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
+func randSeq(n int) string {
+    b := make([]rune, n)
+    for i := range b {
+        b[i] = letters[rand.Intn(len(letters))]
+    }
+    return string(b)
 }
