@@ -6,7 +6,8 @@ import (
 
 import (
 	"github.com/bwmarrin/discordgo"
-	"github.com/jeremie-abt/AmongUsBeautifulBot/iteration3/pkg/domain"
+	"github.com/golang/mock/gomock"
+	"github.com/jeremie-abt/AmongUsBeautifulBot/iteration3/mocks"
 	"github.com/jeremie-abt/AmongUsBeautifulBot/iteration3/pkg/infra/services"
 	"github.com/stretchr/testify/assert"
 )
@@ -19,29 +20,37 @@ func TestForwardMessage(t *testing.T) {
 	// TODO Mock NewBotCommandHandler to make reel test
 	var err error
 
-	bot := services.NewDiscordBotAdapter(domain.NewBotCommandHandler())
-	session, _ := discordgo.New()
-
 	assert := assert.New(t)
 
-	err = bot.ForwardMessage(session, generateDiscordMessage(".bau"))
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	// Domain bot logic interface mock
+	mock := mocks.NewMockIBotCommand(mockCtrl)
+	mock.EXPECT().StartGame(CHANNELID).Return(nil).Times(3)
+	mock.EXPECT().StopGame(CHANNELID).Return(nil).Times(2)
+
+	bot := services.NewDiscordBotAdapter(mock)
+	bot.HandleWrittenMessage(generateDiscordMessage(".bau start"))
+	bot.HandleWrittenMessage(generateDiscordMessage(".bau start  "))
+	bot.HandleWrittenMessage(generateDiscordMessage(".bau   START  "))
+
+	bot.HandleWrittenMessage(generateDiscordMessage(".bau   end  "))
+	bot.HandleWrittenMessage(generateDiscordMessage(".bau   End  "))
+
+	err = bot.HandleWrittenMessage(generateDiscordMessage(".bau"))
 	assert.EqualError(err, services.ErrWrongCommand)
-	err = bot.ForwardMessage(session, generateDiscordMessage(".bau  "))
+	err = bot.HandleWrittenMessage(generateDiscordMessage(".bau      "))
 	assert.EqualError(err, services.ErrWrongCommand)
-	err = bot.ForwardMessage(session, generateDiscordMessage(".bau fake"))
+	err = bot.HandleWrittenMessage(generateDiscordMessage(".bau   asdadsa   "))
 	assert.EqualError(err, services.ErrWrongCommand)
 
-	err = bot.ForwardMessage(session, generateDiscordMessage(".bau start"))
-	assert.NoError(err)
-	err = bot.ForwardMessage(session, generateDiscordMessage(".bau end"))
-	assert.NoError(err)
-	err = bot.ForwardMessage(session, generateDiscordMessage(".bau   end"))
-	assert.NoError(err)
-
-	err = bot.ForwardMessage(session, generateVoiceMessage(true, true))
-	if assert.Error(err) {
-		assert.EqualError(err, "VoiceStateUpdate")
-	}
+	err = bot.HandleWrittenMessage(generateDiscordMessage(".bau"))
+	assert.EqualError(err, services.ErrWrongCommand)
+	err = bot.HandleWrittenMessage(generateDiscordMessage(".bau      "))
+	assert.EqualError(err, services.ErrWrongCommand)
+	err = bot.HandleWrittenMessage(generateDiscordMessage(".bau   asdadsa   "))
+	assert.EqualError(err, services.ErrWrongCommand)
 }
 
 func generateDiscordMessage(msg string) *discordgo.MessageCreate {
