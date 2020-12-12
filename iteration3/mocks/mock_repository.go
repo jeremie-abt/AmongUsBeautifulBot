@@ -103,3 +103,31 @@ func (mr *MockRepositoryMockRecorder) GetGame(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetGame", reflect.TypeOf((*MockRepository)(nil).GetGame), arg0)
 }
+
+// SetDeadPlayer mocks base method
+func (m *MockRepository) SetDeadPlayer(arg0, arg1 string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SetDeadPlayer", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SetDeadPlayer indicates an expected call of SetDeadPlayer
+func (mr *MockRepositoryMockRecorder) SetDeadPlayer(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetDeadPlayer", reflect.TypeOf((*MockRepository)(nil).SetDeadPlayer), arg0, arg1)
+}
+
+// UpdatePlayer mocks base method
+func (m *MockRepository) UpdatePlayer(arg0 string, arg1 *entity.Player) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdatePlayer", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdatePlayer indicates an expected call of UpdatePlayer
+func (mr *MockRepositoryMockRecorder) UpdatePlayer(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdatePlayer", reflect.TypeOf((*MockRepository)(nil).UpdatePlayer), arg0, arg1)
+}

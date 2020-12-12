@@ -60,6 +60,20 @@ func (mr *MockIBotCommandMockRecorder) DeletePlayer(arg0, arg1 interface{}) *gom
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeletePlayer", reflect.TypeOf((*MockIBotCommand)(nil).DeletePlayer), arg0, arg1)
 }
 
+// IsGameIdExisting mocks base method
+func (m *MockIBotCommand) IsGameIdExisting(arg0 string) bool {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "IsGameIdExisting", arg0)
+	ret0, _ := ret[0].(bool)
+	return ret0
+}
+
+// IsGameIdExisting indicates an expected call of IsGameIdExisting
+func (mr *MockIBotCommandMockRecorder) IsGameIdExisting(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsGameIdExisting", reflect.TypeOf((*MockIBotCommand)(nil).IsGameIdExisting), arg0)
+}
+
 // StartGame mocks base method
 func (m *MockIBotCommand) StartGame(arg0 string) error {
 	m.ctrl.T.Helper()

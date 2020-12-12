@@ -15,7 +15,7 @@ type discordBotAdapter struct {
 }
 
 // Dans la conf il faisait en sorte que ca prenne une interface en params
-func NewDiscordBotAdapter(botCmdHandler domain.IBotCommand) IbotCommandService {
+func NewDiscordBotAdapter(botCmdHandler domain.IBotCommand) IDiscordBotWithDiscordGo {
 	return &discordBotAdapter{
 		botCommandHandler: botCmdHandler,
 	}
@@ -27,14 +27,18 @@ func NewDiscordBotAdapter(botCmdHandler domain.IBotCommand) IbotCommandService {
 // pour eviter d'etre colle a discordgo
 // Surtout quand tu prends une lib random en debut de projet car tu as juste envie
 // de commencer a coder.
-func (s *discordBotAdapter) HandleWrittenMessage(msg *discordgo.MessageCreate) error {
-	return s.parseWrittenCommand(msg)
+func (s *discordBotAdapter) HandleWrittenMessage(
+	sess *discordgo.Session,
+	msg *discordgo.MessageCreate) {
+
+	s.parseWrittenCommand(msg)
 }
 
 func (s *discordBotAdapter) StartGame(gameId string) error {
 	// On entre cette fonction sans avoir fais de validation, pour ca qu'une fois de plus
 	// je ne pense pas qu'elle doit etre publique
 
+	println("Bonjour on start une game\n")
 	err := s.botCommandHandler.StartGame(gameId)
 	if err != nil {
 		return err

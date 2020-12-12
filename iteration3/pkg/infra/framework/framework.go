@@ -12,5 +12,14 @@ type Repository interface {
 
 	// Player
 	AddPlayer(gameId string, player *entity.Player) error
+	UpdatePlayer(gameId string, player *entity.Player) error
+	SetDeadPlayer(gameId string, playerId string) error
 	DeletePlayer(gameId string, playerId string) error
+}
+
+type VoipServer interface {
+	MuteAll(game *entity.Game) error
+	UnMuteAll(game *entity.Game) error
+	UpdateColor(game *entity.Game, newPlayer *entity.Player) error
+	UpdateName(game *entity.Game, newPlayer *entity.Player) error
 }

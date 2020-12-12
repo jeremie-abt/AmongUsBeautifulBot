@@ -5,17 +5,15 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"time"
-	"encoding/json"
 
-	"github.com/gorilla/mux"
 	socketio "github.com/googollee/go-socket.io"
-
+	"github.com/gorilla/mux"
 )
-
 
 // Pulse : Chan for sending heartbeat
 func BeginListenSocket(crashReport chan<- interface{}) {
@@ -67,7 +65,7 @@ func socketEvConnectCode(conn socketio.Conn, msg string) {
 	fmt.Printf("Voici le context : %+v\n", conn.Context())
 	propagateEvent(conn, &eventType{
 		eventType: CONNECTCODE,
-		msg: msg,
+		msg:       msg,
 	})
 }
 
@@ -83,6 +81,10 @@ func socketEvLobby(conn socketio.Conn, msg string) {
 }
 
 // msg :
+func (s *socketHandling) HandleDisconnection(msg string, captureCode string) {
+
+}
+
 // 0 -> LOBBY
 // 1 debut de tour je crois (jetais imposteur) / reprise dun tour egalement
 // 2 -> Kill / je lai eu aussi en appuyant sur le bouton Wtfff
@@ -93,7 +95,7 @@ func socketEvState(conn socketio.Conn, msg string) {
 
 	propagateEvent(conn, &eventType{
 		eventType: STATE,
-		msg: msg,
+		msg:       msg,
 	})
 }
 
@@ -110,7 +112,7 @@ func socketEvState(conn socketio.Conn, msg string) {
 func socketEvPlayer(conn socketio.Conn, msg string) {
 	propagateEvent(conn, &eventType{
 		eventType: PLAYER,
-		msg: msg,
+		msg:       msg,
 	})
 }
 
@@ -127,15 +129,14 @@ func handleDisconnection(conn socketio.Conn, reason string) {
 	fmt.Printf("socket disconnection : %s\n", reason)
 }
 
-
 // ------------------------------------ PRIVATE Struct
 // {"Action":5,"Name":"I","IsDead":false,"Disconnected":true,"Color":5}
 type playerEventT struct {
-	Action int `json:"Action"`
-	Name string `json:"Name"`
-	Isdead bool `json:"IsDead"`
-	Disconnected bool `json:"Disconnected"`
-	Color int `json:"Color"`
+	Action       int    `json:"Action"`
+	Name         string `json:"Name"`
+	Isdead       bool   `json:"IsDead"`
+	Disconnected bool   `json:"Disconnected"`
+	Color        int    `json:"Color"`
 }
 
 // ------------------------------------ PRIVATE
@@ -158,7 +159,6 @@ func propagateEvent(conn socketio.Conn, msg *eventType) {
 
 }
 
-
 func handleSocketPlayerEvent(msg string, captureCode string) {
 	// je recois un joueurs (Event 0 -> il vient de se connecter)
 	// Comme il vient de se connecter, il ne doit etre nul part
@@ -174,7 +174,6 @@ func handleSocketPlayerEvent(msg string, captureCode string) {
 	handlePlayerEvent(&playerEvent, captureCode)
 }
 
-
 //------------------------------- Outbound function
 /*
 	Ces fonctions servent a interagir avec le reste du code
@@ -184,26 +183,25 @@ func handlePlayerEvent(playerEvt *playerEventT, captureCode string) {
 
 	curGame, _ := GetGameFromCode(captureCode)
 	if curGame == nil {
-		fmt.Printf("Warning: Following catpure code doesn't exist : %s\n", captureCode)	
+		fmt.Printf("Warning: Following catpure code doesn't exist : %s\n", captureCode)
 		return
 	}
-	discordPlayer := curGame.GetDiscordPlayerFromSocketEvt(playerEvt.Name)	
+	discordPlayer := curGame.GetDiscordPlayerFromSocketEvt(playerEvt.Name)
 	fmt.Printf("Bonjour voici le discord player : %+v\n\n", discordPlayer)
 	if playerEvt.Action == 2 {
 		discordPlayer.IsAlive = false
 	}
 }
 
-
 func handleStateEvent(msg string, captureCode string) {
-	
+
 	curGame, guildManager := GetGameFromCode(captureCode)
 	fmt.Printf("all player : %+v\n", curGame.DiscordPlayers)
 	if curGame == nil {
-		fmt.Printf("Warning: Following catpure code doesn't exist : %s\n", captureCode)	
+		fmt.Printf("Warning: Following catpure code doesn't exist : %s\n", captureCode)
 		return
 	}
-	
+
 	if msg == "1" {
 		/*
 			Debut de tour, on cherche a mute tous le monde

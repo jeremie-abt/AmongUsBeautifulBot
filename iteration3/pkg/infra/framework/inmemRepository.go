@@ -2,8 +2,9 @@ package framework
 
 import (
 	"fmt"
+
+	"github.com/jeremie-abt/AmongUsBeautifulBot/iteration3/pkg/domain/entity"
 )
-import "github.com/jeremie-abt/AmongUsBeautifulBot/iteration3/pkg/domain/entity"
 
 type inmemRepository struct {
 	// Je prend direct un entity.Game
@@ -12,6 +13,12 @@ type inmemRepository struct {
 	// avec des methods qui convertisse les donnees entrante
 	// et sortante
 	game map[string]*entity.Game
+}
+
+func NewInMemRepository() Repository {
+	return &inmemRepository{
+		game: make(map[string]*entity.Game),
+	}
 }
 
 func (i *inmemRepository) AddGame(id string) error {
@@ -41,12 +48,38 @@ func (i *inmemRepository) DeleteGame(id string) error {
 	return nil
 }
 
-func (i *inmemRepository) AddPlayer(gameId string, player *entity.Player) error {
+func (i *inmemRepository) AddPlayer(
+	gameId string, player *entity.Player) error {
 	game, found := i.game[gameId]
 	if !found {
 		return fmt.Errorf(ErrNotExisting)
 	}
 	// Ici je devrais convertir la data normalement
-	game.Players = append(game.Players, player)
+	game.Players[gameId] = player
 	return nil
+}
+
+func (i *inmemRepository) UpdatePlayer(
+	gameId string, player *entity.Player) error {
+	panic("Not impl\n")
+	return nil
+}
+
+func (i *inmemRepository) SetDeadPlayer(
+	gameId string, playerId string) error {
+
+	game, err := i.GetGame(gameId)
+	if err != nil {
+		return err
+	}
+	player, found := game.Players[playerId]
+	if !found {
+		return fmt.Errorf(ErrNotExisting)
+	}
+	player.SetDead()
+	return nil
+}
+
+func (i *inmemRepository) DeletePlayer(gameId string, playerId string) error {
+	panic("DeletePlayer not implemented for inmemRepo\n")
 }

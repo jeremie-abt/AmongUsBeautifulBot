@@ -7,8 +7,6 @@ import (
 	"github.com/jeremie-abt/AmongUsBeautifulBot/iteration3/pkg/infra/framework"
 )
 
-const ErrTooMuchPlayer = "Too much player in this game"
-
 /*
 	IbotCommand Ports implementation
 */
@@ -36,6 +34,9 @@ func (b *BotCommandHandler) StopGame(id string) error {
 		return err
 	}
 	return nil
+}
+func (b *BotCommandHandler) IsGameIdExisting(gameId string) bool {
+	return false
 }
 
 func (b *BotCommandHandler) AddPlayer(gameId string, playerId string) error {
