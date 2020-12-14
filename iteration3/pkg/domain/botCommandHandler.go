@@ -48,7 +48,7 @@ func (b *BotCommandHandler) AddPlayer(gameId string, playerId string) error {
 		return fmt.Errorf(ErrTooMuchPlayer)
 	}
 	// Add
-	err = b.repo.AddPlayer(gameId, entity.NewPlayer(playerId))
+	err = b.repo.AddPlayer(gameId, entity.NewPlayer(playerId, true, "", ""))
 	return err
 }
 

@@ -29,8 +29,8 @@ func TestHandleEvent(t *testing.T) {
 	repoMock := mocks.NewMockRepository(mockCtrlRepo)
 
 	// GAME EVENT TEST (see AmongUsEvtType in entity file)
-	voipServMock.EXPECT().UnMuteAll(entity.NewGame(gameId)).Return(nil).Times(2)
-	voipServMock.EXPECT().MuteAll(entity.NewGame(gameId)).Return(nil).Times(1)
+	voipServMock.EXPECT().UnMuteAll(entity.NewGame(gameId, nil)).Return(nil).Times(2)
+	voipServMock.EXPECT().MuteAll(entity.NewGame(gameId, nil)).Return(nil).Times(1)
 	assert.NoError(nil)
 
 	amongUsEvtHandlerDomain := domain.NewAmongUsEvtHandler(

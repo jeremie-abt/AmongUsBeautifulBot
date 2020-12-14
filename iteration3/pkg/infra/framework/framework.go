@@ -12,6 +12,7 @@ type Repository interface {
 
 	// Player
 	AddPlayer(gameId string, player *entity.Player) error
+	GetPlayer(gameId string, playerId string) (*entity.Player, error)
 	UpdatePlayer(gameId string, player *entity.Player) error
 	SetDeadPlayer(gameId string, playerId string) error
 	DeletePlayer(gameId string, playerId string) error

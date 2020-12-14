@@ -26,7 +26,7 @@ func (i *inmemRepository) AddGame(id string) error {
 	if found {
 		return fmt.Errorf(ErrAlreadyExist)
 	}
-	i.game[id] = entity.NewGame(id)
+	i.game[id] = entity.NewGame(id, nil)
 	return nil
 }
 
@@ -59,6 +59,11 @@ func (i *inmemRepository) AddPlayer(
 	return nil
 }
 
+func (i *inmemRepository) GetPlayer(
+	gameId string, playerId string) (*entity.Player, error) {
+
+	return nil, nil
+}
 func (i *inmemRepository) UpdatePlayer(
 	gameId string, player *entity.Player) error {
 	panic("Not impl\n")

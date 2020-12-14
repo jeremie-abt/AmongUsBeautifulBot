@@ -60,10 +60,12 @@ func (p *Player) IsAlive() bool {
 	return p.isAlive
 }
 
-func NewPlayer(id string) *Player {
+func NewPlayer(id string, alive bool, color string, name string) *Player {
 	return &Player{
 		Id:      id,
-		isAlive: true,
+		isAlive: alive,
+		Color:   color,
+		Name:    name,
 	}
 }
 
@@ -72,8 +74,9 @@ type Game struct {
 	Players map[string]*Player
 }
 
-func NewGame(id string) *Game {
+func NewGame(id string, players map[string]*Player) *Game {
 	return &Game{
-		Id: id,
+		Id:      id,
+		Players: players,
 	}
 }

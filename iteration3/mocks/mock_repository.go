@@ -104,6 +104,21 @@ func (mr *MockRepositoryMockRecorder) GetGame(arg0 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetGame", reflect.TypeOf((*MockRepository)(nil).GetGame), arg0)
 }
 
+// GetPlayer mocks base method
+func (m *MockRepository) GetPlayer(arg0, arg1 string) (*entity.Player, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPlayer", arg0, arg1)
+	ret0, _ := ret[0].(*entity.Player)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetPlayer indicates an expected call of GetPlayer
+func (mr *MockRepositoryMockRecorder) GetPlayer(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPlayer", reflect.TypeOf((*MockRepository)(nil).GetPlayer), arg0, arg1)
+}
+
 // SetDeadPlayer mocks base method
 func (m *MockRepository) SetDeadPlayer(arg0, arg1 string) error {
 	m.ctrl.T.Helper()

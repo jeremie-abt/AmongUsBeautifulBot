@@ -38,7 +38,6 @@ func (s *discordBotAdapter) StartGame(gameId string) error {
 	// On entre cette fonction sans avoir fais de validation, pour ca qu'une fois de plus
 	// je ne pense pas qu'elle doit etre publique
 
-	println("Bonjour on start une game\n")
 	err := s.botCommandHandler.StartGame(gameId)
 	if err != nil {
 		return err
