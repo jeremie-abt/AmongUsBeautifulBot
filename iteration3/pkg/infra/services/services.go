@@ -25,10 +25,10 @@ https://github.com/denverquane/amonguscapture
 Domain dependencies:
 	AmongUsEvent
 */
-type ISocketCaptureCodeEvent interface {
+type ISocketEventAdapter interface {
 	HandleConnectCode(msg string)
-	HandleLobbyEvent(msg string, captureCode string)
-	HandleStateEvent(msg string, captureCode string)
-	HandlePlayerEvent(msg *PlayerEvent, captureCode string)
-	HandleDisconnection(captureCode string)
+	HandleLobbyEvent(msg string, gameId string)
+	HandleStateEvent(msg string, gameId string)
+	HandlePlayerEvent(msg *PlayerEvent, gameId string)
+	HandleDisconnection(gameId string)
 }

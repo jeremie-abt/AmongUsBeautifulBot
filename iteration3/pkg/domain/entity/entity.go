@@ -6,6 +6,8 @@ package entity
 */
 
 type AmongUsEvtType string
+type AmongUsEvtPlayerType AmongUsEvtType
+type AmongUsColor string
 
 // Attention ca ne doit pas etre lie a discordgo
 // je pense que c bien davoir juste ces deux events
@@ -21,7 +23,28 @@ const (
 	NOTIMPLEMENT                     = "NOTIMPL"
 )
 
-const ()
+const (
+	UPDATECOLOR AmongUsEvtType = PLAYERUPDATECOLOR
+	UPDATENAME                 = PLAYERUPDATENAME
+	DEAD                       = PLAYERDEAD
+)
+
+const (
+	AURED        AmongUsColor = "PLAYERUPDATECOLOR"
+	AUBROWN                   = "PLAYERUPDATECOLOR"
+	AUORANGE                  = "PLAYERUPDATECOLOR"
+	AUYELLOW                  = "PLAYERUPDATECOLOR"
+	AUPINK                    = "PLAYERUPDATECOLOR"
+	AUPURPLE                  = "PLAYERUPDATECOLOR"
+	AUBLUE                    = "PLAYERUPDATECOLOR"
+	AUCYAN                    = "PLAYERUPDATECOLOR"
+	AUGREEN                   = "PLAYERUPDATECOLOR"
+	AULIME                    = "PLAYERUPDATECOLOR"
+	AUWHITE                   = "PLAYERUPDATECOLOR"
+	AUBLACK                   = "PLAYERUPDATECOLOR"
+	AUFORTEGREEN              = "PLAYERUPDATECOLOR"
+	AUTAN                     = "PLAYERUPDATECOLOR"
+)
 
 /*
 	Le but de se format est de gerer tous les events socket

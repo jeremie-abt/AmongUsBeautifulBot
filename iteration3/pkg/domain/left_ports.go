@@ -12,5 +12,5 @@ type IBotCommand interface {
 
 // Logic for managing among us event
 type IAmongUsEvent interface {
-	HandleEvent(*entity.AmongUsEvent) error
+	HandleEvent(entity.AmongUsEvent) error
 }

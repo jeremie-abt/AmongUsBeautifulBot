@@ -10,7 +10,7 @@ type DiscordFramework struct {
 	sess *discordgo.Session
 }
 
-func NewDiscordFramework(botToken string) *DiscordFramework {
+func NewDiscordFramework(botToken string) VoipServer {
 	sess, _ := discordgo.New()
 	return &DiscordFramework{
 		sess: sess,
@@ -42,13 +42,13 @@ func (d *DiscordFramework) muteDiscord(game *entity.Game) {
 }
 
 func (d *DiscordFramework) UpdateColor(
-	game *entity.Game, newPlayer entity.Player) error {
+	game *entity.Game, newPlayer *entity.Player) error {
 
 	return nil
 }
 
 func (d *DiscordFramework) UpdateName(
-	game *entity.Game, newPlayer entity.Player) error {
+	game *entity.Game, newPlayer *entity.Player) error {
 
 	return nil
 }

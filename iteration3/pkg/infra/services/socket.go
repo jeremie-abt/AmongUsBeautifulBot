@@ -1,6 +1,7 @@
 package services
 
 import "github.com/jeremie-abt/AmongUsBeautifulBot/iteration3/pkg/domain"
+import "github.com/jeremie-abt/AmongUsBeautifulBot/iteration3/pkg/infra/framework"
 import "github.com/jeremie-abt/AmongUsBeautifulBot/iteration3/pkg/domain/entity"
 
 type socketHandling struct {
@@ -8,23 +9,35 @@ type socketHandling struct {
 	botCmdHandler  domain.IBotCommand
 }
 
+type SocketEvt string
+
+const (
+	PLAYERUPDATECOLOR SocketEvt = "PLAYERUPDATECOLOR"
+	PLAYERUPDATENAME            = "PLAYERUPDATENAME"
+	PLAYERDEAD                  = "PLAYERDEAD"
+)
+
 type PlayerEvent struct {
-	Name   string `json:"name"`
-	Action string `json:"action"`
-	Color  string `json:"color"`
+	Name   string                      `json:"name"`
+	Action entity.AmongUsEvtPlayerType `json:"action"`
+	Color  entity.AmongUsColor         `json:"color"`
 }
 
-func NewSocketHandling(
-	auEvtHandler domain.IAmongUsEvent,
-	botCmdHandler domain.IBotCommand) ISocketCaptureCodeEvent {
+func NewSocketAdapter() ISocketEventAdapter {
+
+	redisRepo := framework.NewRedisRepository()
+	discordVoip := framework.NewDiscordFramework("Nil")
+
+	auEvtHandler := domain.NewAmongUsEvtHandler(discordVoip, redisRepo)
+	botCmdHandler := domain.NewBotCommandHandler(redisRepo)
 	return &socketHandling{
 		auEventHandler: auEvtHandler,
 		botCmdHandler:  botCmdHandler,
 	}
 }
 
-func (s *socketHandling) HandleConnectCode(captureCode string) {
-	if !s.botCmdHandler.IsGameIdExisting(captureCode) {
+func (s *socketHandling) HandleConnectCode(gameId string) {
+	if !s.botCmdHandler.IsGameIdExisting(gameId) {
 		// TODO: que faire lorsque je recois un code pour une game
 		// qui nexiste pas ?
 		// Throw un error pour les sockets ??
@@ -32,43 +45,36 @@ func (s *socketHandling) HandleConnectCode(captureCode string) {
 }
 
 // ???
-func (s *socketHandling) HandleLobbyEvent(msg string, captureCode string) {
-	evt := transformLobbyEventForDomain(msg, captureCode)
+func (s *socketHandling) HandleLobbyEvent(msg string, gameId string) {
+	evt := transformLobbyEventForDomain(msg, gameId)
 
 	if evt != nil {
-		err := s.auEventHandler.HandleEvent(evt)
+		err := s.auEventHandler.HandleEvent(*evt)
 		if err != nil {
 			panic(err)
 		}
 	}
 }
 
-func (s *socketHandling) HandleStateEvent(msg string, captureCode string) {
-	evt := transformStateEventForDomain(msg, captureCode)
+func (s *socketHandling) HandleStateEvent(msg string, gameId string) {
+	evt := transformStateEventForDomain(msg, gameId)
 
 	if evt != nil {
-		err := s.auEventHandler.HandleEvent(evt)
+		err := s.auEventHandler.HandleEvent(*evt)
 		if err != nil {
 			panic(err)
 		}
 	}
 }
-func (s *socketHandling) HandlePlayerEvent(msg *PlayerEvent, captureCode string) {
+func (s *socketHandling) HandlePlayerEvent(msg *PlayerEvent, gameId string) {
 
 }
 
-func transformLobbyEventForDomain(
-	msg string, captureCode string) *entity.AmongUsEvent {
-	// TODO : Implement
-	return &entity.AmongUsEvent{
-		AttachedGameId: captureCode,
-		Evttype:        entity.NOTIMPLEMENT,
-	}
-}
-
-func (s *socketHandling) HandleDisconnection(captureCode string) {
+func (s *socketHandling) HandleDisconnection(gameId string) {
 
 }
+
+// Private methods
 
 /*
 msg.Action :
@@ -79,10 +85,10 @@ msg.Action :
 	6 -> mort pour les votes.
 */
 func transformPlayerEventForDomain(
-	msg *PlayerEvent, captureCode string) *entity.AmongUsEvent {
+	msg *PlayerEvent, gameId string) *entity.AmongUsEvent {
 
 	evtReturned := &entity.AmongUsEvent{
-		AttachedGameId: captureCode,
+		AttachedGameId: gameId,
 		PlayerName:     msg.Name,
 	}
 
@@ -101,6 +107,15 @@ func transformPlayerEventForDomain(
 	return evtReturned
 }
 
+func transformLobbyEventForDomain(
+	msg string, gameId string) *entity.AmongUsEvent {
+	// TODO : Implement
+	return &entity.AmongUsEvent{
+		AttachedGameId: gameId,
+		Evttype:        entity.NOTIMPLEMENT,
+	}
+}
+
 /*
 msg :
 	0 -> LOBBY
@@ -108,20 +123,20 @@ msg :
 	3 -> Reunion vocale
 */
 func transformStateEventForDomain(
-	msg string, captureCode string) *entity.AmongUsEvent {
+	msg string, gameId string) *entity.AmongUsEvent {
 	if msg == "0" {
 		return &entity.AmongUsEvent{
-			AttachedGameId: captureCode,
+			AttachedGameId: gameId,
 			Evttype:        entity.GAMELOBBY,
 		}
 	} else if msg == "1" {
 		return &entity.AmongUsEvent{
-			AttachedGameId: captureCode,
+			AttachedGameId: gameId,
 			Evttype:        entity.GAMELOBBY,
 		}
 	} else if msg == "3" {
 		return &entity.AmongUsEvent{
-			AttachedGameId: captureCode,
+			AttachedGameId: gameId,
 			Evttype:        entity.GAMELOBBY,
 		}
 	}

@@ -14,7 +14,7 @@ type BotCommandHandler struct {
 	repo framework.Repository
 }
 
-func NewBotCommandHandler(repo framework.Repository) *BotCommandHandler {
+func NewBotCommandHandler(repo framework.Repository) IBotCommand {
 	return &BotCommandHandler{
 		repo: repo,
 	}

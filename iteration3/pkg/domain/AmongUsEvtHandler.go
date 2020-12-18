@@ -13,7 +13,7 @@ type AmongUsEvtHandler struct {
 
 func NewAmongUsEvtHandler(
 	vp framework.VoipServer,
-	repo framework.Repository) *AmongUsEvtHandler {
+	repo framework.Repository) IAmongUsEvent {
 	return &AmongUsEvtHandler{
 		voipServerFramework: vp,
 		repo:                repo,
@@ -45,7 +45,6 @@ func (a *AmongUsEvtHandler) HandleEvent(evt entity.AmongUsEvent) error {
 
 		return a.handlePlayerEvent(&evt)
 	}
-
 	return nil
 }
 

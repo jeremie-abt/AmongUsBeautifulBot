@@ -4,7 +4,6 @@ import "context"
 import "github.com/go-redis/redis"
 
 import (
-	"fmt"
 	"github.com/jeremie-abt/AmongUsBeautifulBot/iteration3/pkg/domain/entity"
 	"os"
 	"strings"
@@ -26,7 +25,6 @@ func NewRedisRepository() Repository {
 		// Default port
 		redisPort = "6700"
 	}
-	fmt.Printf("Voici la varialbe : %s\n\n", redisPort)
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     "localhost:" + redisPort, // use default Addr
 		Password: "",                       // no password set

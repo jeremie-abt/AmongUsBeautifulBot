@@ -10,8 +10,6 @@ integrationtest:
 	@REDIS_HOST=6701 go test -coverpkg=./... pkg/infra/framework/redisRepositor* pkg/infra/framework/framework.go
 	@sudo docker container stop redis > /dev/null
 
-runBot:
-	@go run cmd/bot/bot.go
 
 updateMock:
 	@mockgen -destination=mocks/mock_voipServer.go -package=mocks "github.com/jeremie-abt/AmongUsBeautifulBot/iteration3/pkg/infra/framework" VoipServer
@@ -27,4 +25,11 @@ startRedisStack:
 
 stopRedisStack:
 	@sudo docker stop redis
+
+## Launchin my commands
+runBot:
+	@go run cmd/bot/bot.go
+
+runSocket:
+	@go run cmd/socket/socketCaptureCode.go cmd/socket/hub.go
 
